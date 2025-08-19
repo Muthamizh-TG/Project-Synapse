@@ -1,0 +1,16 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+:root{
+  --primary: #000000;
+  --text: #ffffff;
+  --secondry_color: #3d3d3d;
+}
+
+/* index.html */
+nav{
+    background-color: var(--blue);
+}
+/* chatbot.html */
