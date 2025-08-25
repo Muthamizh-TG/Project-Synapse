@@ -1,152 +1,188 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Synapse - Login</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=initial-scale=1.0">
+   <title>Login</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
- 
-    body {
-      margin: 0;
-      background: black;
-      font-family: 'Poppins', sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      color: white;
-    }
- 
-    .logo-text {
-      position: absolute;
-      top: 40px;
-      left: 80px;
-      font-size: 36px;
-      font-weight: 500;
-    }
- 
-    .card {
-      background: #3D3D3D;
-      padding: 40px;
-      border-radius: 20px;
-      width: 400px;
-      box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-      text-align: center;
-    }
- 
-    .card h2 {
-      font-size: 40px;
-      font-weight: 700;
-      margin-bottom: 30px;
-      color: white;
-    }
- 
-    .card input {
-      width: 100%;
-      padding: 14px;
-      margin: 12px 0;
-      border-radius: 18px;
-      border: 1px solid black;
-      font-size: 18px;
-    }
- 
-    .card button {
-      width: 100%;
-      padding: 14px;
-      margin-top: 20px;
-      background: black;
-      color: white;
-      border: none;
-      border-radius: 18px;
-      font-size: 24px;
-      font-weight: 500;
-      cursor: pointer;
-    }
- 
-    .signup-prompt {
-      margin-top: 20px;
-      font-size: 18px;
-      color: white;
-    }
- 
-    .signup-prompt span:last-child {
-      color: #CC88EC;
-      font-weight: 800;
-      margin-left: 5px;
-      cursor: pointer;
-    }
- 
-    .divider {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 20px 0;
-    }
- 
-    .divider-line {
-      flex: 1;
-      height: 1px;
-      background: white;
-      margin: 0 10px;
-    }
- 
-    .divider-text {
-      font-size: 18px;
-      color: white;
-    }
- 
-    .google-button {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: white;
-      color: black;
-      padding: 12px;
-      border-radius: 18px;
-      border: 1px solid black;
-      font-weight: bold;
-      font-size: 18px;
-      gap: 12px;
-      cursor: pointer;
-    }
- 
-    .google-button img {
-      width: 32px;
-      height: 32px;
-    }
-    .signup{
-        text-decoration:none;
-    }
+      body {
+        background: linear-gradient(135deg, #232526 0%, #414345 100%);
+        color: #fff;
+        font-family: 'Segoe UI', Arial, sans-serif;
+        margin: 0;
+        min-height: 100vh;
+      }
+      .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #222;
+        color: #fff;
+        padding: 0.5rem 2rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+      .navbar-logo {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1.2rem;
+        font-weight: bold;
+      }
+      .navbar-links {
+        list-style: none;
+        display: flex;
+        gap: 1.5rem;
+        margin: 0;
+        padding: 0;
+      }
+      .navbar-links a {
+        color: #fff;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s;
+      }
+      .navbar-links a:hover {
+        color: #00bcd4;
+      }
+      .container-center {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+      }
+      .SignUp-container {
+        width: 350px;
+        border: 1px solid #3d3d3d;
+        background-color: #292929;
+        padding: 32px 28px 24px 28px;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+      }
+      .SignUp-container form {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .SignUp-container input {
+        padding: 12px;
+        border-radius: 6px;
+        background-color: #222;
+        color: #fff;
+        border: 1.5px solid #444;
+        font-size: 1rem;
+        outline: none;
+        transition: border 0.2s;
+      }
+      .SignUp-container input:focus {
+        border-color: #00bcd4;
+      }
+      .SignUp-container button {
+        border-radius: 6px;
+        background: linear-gradient(90deg, #00bcd4 0%, #ba00df 100%);
+        color: #fff;
+        width: 100%;
+        height: 44px;
+        font-weight: 600;
+        text-transform: uppercase;
+        border: none;
+        font-size: 1rem;
+        cursor: pointer;
+        margin-top: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        transition: background 0.2s;
+      }
+      .SignUp-container button:hover {
+        background: linear-gradient(90deg, #ba00df 0%, #00bcd4 100%);
+      }
+      .SignUp-container .line {
+        padding: 2px;
+        text-align: center;
+        font-weight: 900;
+        margin: 12px 0;
+        color: #aaa;
+      }
+      .google-button {
+        margin: 0 auto;
+        text-align: center;
+        background-color: #fff;
+        width: 100%;
+        border-radius: 6px;
+        padding: 10px 0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+      .google-button a {
+        text-decoration: none;
+        color: #222;
+        font-weight: 600;
+        font-size: 1rem;
+      }
+      .google-button img {
+        width: 22px;
+        height: 22px;
+        vertical-align: middle;
+        margin-right: 6px;
+      }
+      .SignUp-container form p {
+        text-align: center;
+        margin: 0;
+      }
+      .SignUp-container form p a {
+        color: #00bcd4;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.2s;
+      }
+      .SignUp-container form p a:hover {
+        color: #ba00df;
+      }
+      h1 {
+        color: #fff;
+        text-align: center;
+        margin-bottom: 18px;
+        font-size: 2rem;
+        font-weight: 700;
+      }
+      @media (max-width: 500px) {
+        .SignUp-container {
+          width: 95vw;
+          padding: 18px 8px;
+        }
+      }
   </style>
 </head>
 <body>
-  <div class="logo-text">Synapse</div>
- 
-  <div class="card">
-    <h2>Login</h2>
-    <input type="email" placeholder="Email" />
-    <input type="password" placeholder="Password" />
-    <button>Login</button>
- 
-    <div class="signup-prompt">
-      <span>If you don’t have an account?</span>
-      <span><a href="index.html" class="signup">Signup</a></span>
+    <nav class="navbar">
+      <div class="navbar-logo">
+        <img src="../Assets/Images/1.svg" alt="Logo" height="32">
+        <span>Project Synapse</span>
+      </div>
+      <ul class="navbar-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="chatbot.html">Chatbot</a></li>
+        <li><a href="chathistory.html">History</a></li>
+        <li><a href="login.html">Login</a></li>
+        <li><a href="signup.html">Sign Up</a></li>
+      </ul>
+    </nav>
+    <div class="container-center">
+      <div class="SignUp-container">
+        <form action="#">
+          <h1>Login</h1>
+          <input type="email" placeholder="Email" required>
+          <input type="password" placeholder="Password" required>
+          <button type="submit">Login</button>
+          <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
+          <div class="line">OR</div>
+          <div class="google-button">
+            <img src="../Assets/Images/download.png" alt="Google icon">
+            <a href="http://google.com/">Sign in with Google</a>
+          </div>
+        </form>
+      </div>
     </div>
- 
-    <div class="divider">
-      <div class="divider-line"></div>
-      <div class="divider-text">Or</div>
-      <div class="divider-line"></div>
-    </div>
- 
-    <div class="google-button">
-      <img src="download.png" alt="Google logo" />
-      Login with Google
-    </div>
-  </div>
 </body>
 </html>
- 
- 

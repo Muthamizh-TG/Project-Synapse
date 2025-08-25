@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Synapse</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    :root {
+      --bg: #1a1a1a;
+      --text: #ffffff;
+      --accent: #e0e0e0;
+      --card-bg: rgba(40, 40, 40, 0.9);
+      --card-border: rgba(255, 255, 255, 0.2);
+      --shadow: rgba(0, 0, 0, 0.3);
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      overflow-x: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -280px;
+      width: 280px;
+      height: 100%;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      padding: 2rem 1rem;
+      transition: left 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      z-index: 1000;
+      border-right: 1px solid var(--card-border);
+    }
+    .sidebar.active {
+      left: 0;
+    }
+    .sidebar h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .sidebar ul {
+      list-style: none;
+    }
+    .sidebar li {
+      margin: 1rem 0;
+    }
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      color: var(--text);
+      text-decoration: none;
+      padding: 0.8rem;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+    .sidebar a:hover, .sidebar a:focus {
+      background: var(--accent);
+      color: #000000;
+      transform: translateX(5px);
+      outline: none;
+    }
+    .sidebar .icon {
+      font-size: 1.2rem;
+    }
+
+    /* Toggle Button */
+    #toggleBtn {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      z-index: 1100;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    #toggleBtn:hover, #toggleBtn:focus {
+      background: var(--accent);
+      color: #000000;
+      transform: rotate(90deg);
+      outline: none;
+    }
+
+    /* Main Content */
+    .main-content {
+      margin: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 2rem);
+    }
+    .content-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 800px;
+      width: 100%;
+      text-align: center;
+      animation: slideUp 0.6s ease-out;
+      box-shadow: 0 6px 40px var(--shadow);
+    }
+    @keyframes slideUp {
+      from { transform: translateY(60px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .content-card h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      color: var(--accent);
+    }
+    .content-card p {
+      font-size: 1.1rem;
+      line-height: 1.7;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 1100;
+    }
+    .action-buttons button {
+      padding: 0.5rem 1.5rem;
+      border: none;
+      border-radius: 20px;
+      background: var(--card-bg);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+    .action-buttons button:hover, .action-buttons button:focus {
+      background: var(--accent);
+      color: #000000;
+      transform: translateY(-2px);
+      outline: none;
+    }
+
+    /* Suggestion Bar */
+    .suggestion-bar {
+      position: fixed;
+      bottom: 4rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 600px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 0.5rem;
+      z-index: 1000;
+    }
+    .suggestion-bar span {
+      font-size: 0.9rem;
+      color: var(--text);
+      padding: 0.5rem;
+      cursor: pointer;
+      text-align: center;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .suggestion-bar span:hover, .suggestion-bar span:focus {
+      background: var(--accent);
+      color: #000000;
+      transform: scale(1.02);
+      outline: none;
+    }
+
+    /* Input Bar */
+    .input-bar {
+      position: fixed;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 600px;
+      display: flex;
+      align-items: center;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 50px;
+      padding: 0.5rem;
+    }
+    .input-bar input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      padding: 0.8rem 1rem;
+      color: var(--text);
+      font-size: 1rem;
+    }
+    .input-bar input::placeholder {
+      color: var(--text);
+      opacity: 0.5;
+    }
+    .input-bar button {
+      background: var(--accent);
+      border: none;
+      border-radius: 50px;
+      padding: 0.8rem 1.5rem;
+      color: #000000;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .input-bar button:hover, .input-bar button:focus {
+      transform: scale(1.05);
+      outline: none;
+    }
+    .input-bar button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar { width: 240px; }
+      .content-card { padding: 1.5rem; }
+      .suggestion-bar, .input-bar { width: 95%; }
+      .suggestion-bar { grid-template-columns: 1fr; }
+      .action-buttons { flex-direction: column; right: 0.5rem; }
+    }
+    @media (max-width: 480px) {
+      .content-card h1 { font-size: 1.8rem; }
+      .action-buttons button { padding: 0.4rem 1rem; font-size: 0.9rem; }
+      .suggestion-bar, .input-bar { padding: 0.4rem; }
+      .suggestion-bar span, .input-bar input { font-size: 0.9rem; }
+      .input-bar button { padding: 0.6rem 1rem; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Toggle Button -->
+  <button id="toggleBtn" aria-label="Toggle navigation menu">☰</button>
+
+  <!-- Action Buttons -->
+  <div class="action-buttons">
+    <button id="loginBtn" aria-label="Log in">Login</button>
+    <button id="signupBtn" aria-label="Sign up">Signup</button>
+  </div>
+
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
+    <h2>Synapse</h2>
+    <ul>
+      <li><a href="#" tabindex="0" aria-label="Chat section"><span class="icon">💬</span>Chat</a></li>
+      <li><a href="#" tabindex="0" aria-label="Voice section"><span class="icon">🎙️</span>Voice</a></li>
+      <li><a href="#" tabindex="0" aria-label="File section"><span class="icon">📁</span>File</a></li>
+      <li><a href="#" tabindex="0" aria-label="Tasks section"><span class="icon">✅</span>Tasks</a></li>
+      <li><a href="#" tabindex="0" aria-label="History section"><span class="icon">🕒</span>History</a></li>
+    </ul>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content" role="main">
+    <section class="content-card" aria-labelledby="welcome-title">
+      <h1 id="welcome-title">Welcome to Synapse</h1>
+      <p>Connect, explore, and interact with the world in a new way. Ask anything or dive into the menu to get started!</p>
+    </section>
+  </main>
+
+  <!-- Suggestion Bar -->
+  <div class="suggestion-bar" role="region" aria-label="Suggested questions">
+    <span tabindex="0" data-query="What's the weather like today?">What's the weather like today?</span>
+    <span tabindex="0" data-query="Tell me a fun fact!">Tell me a fun fact!</span>
+    <span tabindex="0" data-query="How do I learn coding?">How do I learn coding?</span>
+  </div>
+
+  <!-- Input Bar -->
+  <div class="input-bar" role="search">
+    <input type="text" placeholder="Ask Anything..." aria-label="Enter your question" id="queryInput" />
+    <button id="sendBtn" aria-label="Submit question">Send</button>
+  </div>
+
+  <!-- JS -->
+  <script>
+    // Utility function for debouncing
+    const debounce = (func, wait) => {
+      let timeout;
+      return (...args) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+      };
+    };
+
+    // DOM Elements
+    const toggleBtn = document.getElementById("toggleBtn");
+    const sidebar = document.getElementById("sidebar");
+    const queryInput = document.getElementById("queryInput");
+    const sendBtn = document.getElementById("sendBtn");
+    const suggestionBar = document.querySelector(".suggestion-bar");
+
+    // Toggle sidebar
+    const toggleSidebar = () => {
+      const isActive = sidebar.classList.toggle("active");
+      toggleBtn.textContent = isActive ? "✖" : "☰";
+      toggleBtn.setAttribute("aria-expanded", isActive);
+      if (isActive) queryInput.focus();
+    };
+
+    toggleBtn.addEventListener("click", toggleSidebar);
+
+    // Handle input submission with loading state
+    const handleQuery = async () => {
+      const query = queryInput.value.trim();
+      if (!query) return;
+
+      sendBtn.disabled = true;
+      sendBtn.textContent = "Sending...";
+      try {
+        // Simulate async operation (e.g., API call)
+        await new Promise(resolve => setTimeout(resolve, 500));
+        console.log("Query:", query);
+        queryInput.value = "";
+        queryInput.focus();
+      } finally {
+        sendBtn.disabled = false;
+        sendBtn.textContent = "Send";
+      }
+    };
+
+    // Debounced input handler
+    const debouncedHandleQuery = debounce(handleQuery, 300);
+
+    sendBtn.addEventListener("click", handleQuery);
+    queryInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") debouncedHandleQuery();
+    });
+
+    // Handle suggestion clicks
+    suggestionBar.querySelectorAll("span").forEach(suggestion => {
+      suggestion.addEventListener("click", () => {
+        queryInput.value = suggestion.dataset.query;
+        queryInput.focus();
+        debouncedHandleQuery();
+      });
+      suggestion.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          queryInput.value = suggestion.dataset.query;
+          queryInput.focus();
+          debouncedHandleQuery();
+        }
+      });
+    });
+
+    // Close sidebar with Escape key
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && sidebar.classList.contains("active")) {
+        toggleSidebar();
+      }
+    });
+
+    // Focus management for accessibility
+    sidebar.querySelectorAll("a").forEach(link => {
+      link.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          link.click();
+        }
+      });
+    });
+
+    // Prevent double-tap zoom on mobile
+    document.addEventListener("touchstart", (e) => {
+      if (e.touches.length > 1) e.preventDefault();
+    }, { passive: false });
+  </script>
+</body>
+</html>
