@@ -262,6 +262,362 @@
       .suggestion-bar span, .input-bar input { font-size: 0.9rem; }
       .input-bar button { padding: 0.6rem 1rem; }
     }
+
+    /* Modal Styles - Updated for left positioning */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: var(--bg);
+      width: 80%;
+      height: 80%;
+      border-radius: 12px;
+      padding: 0;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 6px 40px var(--shadow);
+    }
+
+    .close {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 24px;
+      cursor: pointer;
+      color: var(--accent);
+      z-index: 1001;
+      transition: color 0.2s ease;
+    }
+
+    .close:hover {
+      color: var(--text);
+    }
+
+    /* History-specific Styles - Updated colors */
+    .history-header {
+      background-color: var(--card-bg);
+      height: 40px;
+      display: flex;
+      align-items: center;
+      padding: 0 15px;
+      border-bottom: 1px solid var(--card-border);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      box-shadow: 0 2px 10px var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .history-sidebar {
+      width: 250px;
+      background-color: var(--card-bg);
+      padding: 60px 15px 15px 15px;
+      border-right: 1px solid var(--card-border);
+      overflow-y: auto;
+      height: 100%;
+      transition: width 0.3s ease;
+      scrollbar-width: thin;
+      scrollbar-color: var(--card-border) transparent;
+      backdrop-filter: blur(12px);
+    }
+
+    .history-sidebar h3 {
+      margin-top: 0;
+      font-size: 1.2em;
+      color: var(--accent);
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 8px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .history-sidebar ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .history-sidebar ul li {
+      padding: 12px;
+      cursor: pointer;
+      border-bottom: 1px solid var(--card-border);
+      transition: all 0.3s ease;
+      position: relative;
+      display: flex;
+      align-items: center;
+      color: var(--text);
+    }
+
+    .history-sidebar ul li:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: var(--accent);
+    }
+
+    .history-sidebar ul li.active {
+      background-color: var(--accent);
+      color: #000000;
+      font-weight: 600;
+    }
+
+    .history-sidebar ul li.active::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 20px;
+      background-color: #00aaff;
+    }
+
+    .history-main-content {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      background-color: var(--bg);
+      padding: 25px;
+      height: 100%;
+      overflow-y: auto;
+      transition: padding 0.3s ease;
+      scrollbar-width: thin;
+      scrollbar-color: var(--card-border) transparent;
+      padding-top: 65px;
+      padding-bottom: 25px;
+    }
+
+    .history-main-content h2 {
+      color: var(--accent);
+      font-size: 1.5em;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .history-item {
+      width: 80%;
+      padding: 15px;
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      margin-bottom: 15px;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(12px);
+    }
+
+    .history-item:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-color: var(--accent);
+    }
+
+    .history-item p {
+      color: var(--text);
+      font-size: 1.1em;
+      margin: 5px 0;
+    }
+
+    .history-item .date {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.9em;
+    }
+
+    .search-bar {
+      width: 80%;
+      padding: 14px;
+      margin-bottom: 25px;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      font-size: 1em;
+      outline: none;
+      background-color: var(--card-bg);
+      color: var(--text);
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 6px var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .search-bar:focus {
+      border-color: #00aaff;
+      box-shadow: 0 0 8px rgba(0, 170, 255, 0.4);
+    }
+
+    .search-bar::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Custom scrollbar */
+    *::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    *::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    *::-webkit-scrollbar-thumb {
+      background-color: var(--card-border);
+      border-radius: 4px;
+      border: 2px solid var(--bg);
+    }
+
+    *::-webkit-scrollbar-thumb:hover {
+      background-color: var(--accent);
+    }
+
+    @media (max-width: 768px) {
+      .modal {
+        padding: 0.5rem;
+        align-items: stretch;
+      }
+
+      .modal-content {
+        width: calc(100% - 1rem);
+        height: calc(100vh - 1rem);
+        flex-direction: column;
+      }
+
+      .history-sidebar {
+        width: 100%;
+        height: 150px;
+        padding: 50px 10px 10px 10px;
+        border-right: none;
+        border-bottom: 1px solid var(--card-border);
+        overflow-x: auto;
+      }
+
+      .history-sidebar h3 {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .history-sidebar ul {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+
+      .history-sidebar ul li {
+        padding: 8px 12px;
+        white-space: nowrap;
+        border: 1px solid var(--card-border);
+        border-radius: 6px;
+        margin-bottom: 0;
+      }
+
+      .history-main-content {
+        padding: 15px;
+        padding-top: 20px;
+        height: calc(100% - 150px);
+      }
+
+      .search-bar, .history-item {
+        width: 95%;
+      }
+
+      .history-main-content h2 {
+        font-size: 1.2em;
+        margin-bottom: 15px;
+      }
+
+      .history-item {
+        padding: 12px;
+        margin-bottom: 10px;
+      }
+
+      .history-item p {
+        font-size: 0.95em;
+        line-height: 1.4;
+      }
+
+      .history-item .date {
+        font-size: 0.85em;
+      }
+
+      .close {
+        font-size: 28px;
+        top: 8px;
+        right: 15px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .modal {
+        padding: 0.25rem;
+      }
+
+      .modal-content {
+        width: calc(100% - 0.5rem);
+        height: calc(100vh - 0.5rem);
+        border-radius: 8px;
+      }
+
+      .history-sidebar {
+        height: 120px;
+        padding: 45px 8px 8px 8px;
+      }
+
+      .history-sidebar h3 {
+        font-size: 0.9rem;
+        margin-bottom: 0.3rem;
+      }
+
+      .history-sidebar ul li {
+        padding: 6px 10px;
+        font-size: 0.85em;
+      }
+
+      .history-main-content {
+        padding: 10px;
+        padding-top: 15px;
+        height: calc(100% - 120px);
+      }
+
+      .search-bar {
+        width: 98%;
+        padding: 10px;
+        font-size: 0.9em;
+        margin-bottom: 15px;
+      }
+
+      .history-item {
+        width: 98%;
+        padding: 10px;
+        margin-bottom: 8px;
+      }
+
+      .history-main-content h2 {
+        font-size: 1.1em;
+        margin-bottom: 10px;
+      }
+
+      .history-item p {
+        font-size: 0.9em;
+      }
+
+      .history-item .date {
+        font-size: 0.8em;
+      }
+
+      .close {
+        font-size: 24px;
+        top: 5px;
+        right: 10px;
+      }
+    }
   </style>
 </head>
 
@@ -283,7 +639,7 @@
       <li><a href="#" tabindex="0" aria-label="Voice section">Voice</a></li>
       <li><a href="#" tabindex="0" aria-label="File section">File</a></li>
       <li><a href="#" tabindex="0" aria-label="Tasks section">Tasks</a></li>
-      <li><a href="#" tabindex="0" aria-label="History section">History</a></li>
+      <li><a href="#" id="history-menu" tabindex="0" aria-label="History section">History</a></li>
     </ul>
   </nav>
 
@@ -297,9 +653,9 @@
 
   <!-- Suggestion Bar -->
   <div class="suggestion-bar" role="region" aria-label="Suggested questions">
-    <span tabindex="0" data-query="What's the weather like today?">What's the weather like today?</span>
-    <span tabindex="0" data-query="Tell me a fun fact!">Tell me a fun fact!</span>
-    <span tabindex="0" data-query="How do I learn coding?">How do I learn coding?</span>
+    <span tabindex="0" data-query="What's the weather like today?">“What are some restaurants near me?”</span>
+    <span tabindex="0" data-query="Tell me a fun fact!">“Where’s the closest cafe with free Wi-Fi?”</span>
+    <span tabindex="0" data-query="How do I learn coding?">“Can you find a library with internet access nearby?”</span>
   </div>
 
   <!-- Input Bar -->
@@ -308,9 +664,47 @@
     <button id="sendBtn" aria-label="Submit question">Send</button>
   </div>
 
+  <!-- History Modal -->
+  <div id="history-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="close-modal">&times;</span>
+      <div class="history-header"></div>
+      <div class="history-sidebar">
+        <h3>Filters</h3>
+        <ul>
+          <li class="active">All Time</li>
+          <li>Last 7 Days</li>
+          <li>Last 30 Days</li>
+        </ul>
+        <h3>Categories</h3>
+        <ul>
+          <li>Technology</li>
+          <li>Finance</li>
+          <li>General</li>
+        </ul>
+      </div>
+      <div class="history-main-content">
+        <input type="text" class="search-bar" placeholder="Search History...">
+        <h2>Conversation History</h2>
+        <div class="history-item">
+          <p>Discussion on AI Innovations - 03:00 PM IST, Aug 25, 2025</p>
+          <p class="date">Duration: 15 minutes</p>
+        </div>
+        <div class="history-item">
+          <p>Stock Market Trends Analysis - 02:30 PM IST, Aug 25, 2025</p>
+          <p class="date">Duration: 20 minutes</p>
+        </div>
+        <div class="history-item">
+          <p>Tech News Roundup - 01:45 PM IST, Aug 25, 2025</p>
+          <p class="date">Duration: 10 minutes</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- JS -->
   <script>
-    // Utility function for debouncing
+    
     const debounce = (func, wait) => {
       let timeout;
       return (...args) => {
@@ -401,6 +795,26 @@
     document.addEventListener("touchstart", (e) => {
       if (e.touches.length > 1) e.preventDefault();
     }, { passive: false });
+
+    // History Modal Functionality
+    const historyMenu = document.getElementById('history-menu');
+    const modal = document.getElementById('history-modal');
+    const closeModal = document.getElementById('close-modal');
+
+    historyMenu.addEventListener('click', function(e) {
+      e.preventDefault();
+      modal.style.display = 'flex';
+    });
+
+    closeModal.addEventListener('click', function() {
+      modal.style.display = 'none';
+    });
+
+    window.addEventListener('click', function(event) {
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
   </script>
 </body>
 </html>
