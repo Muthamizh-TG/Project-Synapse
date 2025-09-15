@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Synapse</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Synapse AI Chatbot</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
   <style>
     * {
@@ -19,6 +18,8 @@
       --card-bg: rgba(40, 40, 40, 0.9);
       --card-border: rgba(255, 255, 255, 0.2);
       --shadow: rgba(0, 0, 0, 0.3);
+      --user-bg: #6a5acd;
+      --error-bg: #e63946;
     }
     body {
       font-family: 'Poppins', sans-serif;
@@ -28,7 +29,7 @@
       transition: transform 0.3s ease, opacity 0.3s ease;
       overflow-x: hidden;
     }
-
+ 
     /* Sidebar */
     .sidebar {
       position: fixed;
@@ -75,10 +76,7 @@
       transform: translateX(5px);
       outline: none;
     }
-    .sidebar .icon {
-      font-size: 1.2rem;
-    }
-
+ 
     /* Toggle Button */
     #toggleBtn {
       position: fixed;
@@ -102,17 +100,18 @@
       transform: rotate(90deg);
       outline: none;
     }
-
+ 
     /* Main Content */
-    .main-content {
+    .main-container {
       margin: 1rem;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       min-height: calc(100vh - 2rem);
+      gap: 1rem;
     }
-    .content-card {
+    .welcome-box {
       background: var(--card-bg);
       backdrop-filter: blur(12px);
       border: 1px solid var(--card-border);
@@ -123,21 +122,208 @@
       text-align: center;
       animation: slideUp 0.6s ease-out;
       box-shadow: 0 6px 40px var(--shadow);
+      margin-bottom: 1rem;
+    }
+    .welcome-box.hidden {
+      opacity: 0;
+      transform: translateY(-20px);
+      pointer-events: none;
+      height: 0;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
     }
     @keyframes slideUp {
       from { transform: translateY(60px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
     }
-    .content-card h1 {
+    .welcome-box h1 {
       font-size: 2.5rem;
       margin-bottom: 1rem;
       color: var(--accent);
     }
-    .content-card p {
+    .welcome-box p {
       font-size: 1.1rem;
       line-height: 1.7;
+      color: var(--text);
     }
-
+ 
+    /* Chat Area */
+    #chat {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      box-shadow: 0 4px 12px var(--shadow);
+      display: flex;
+      flex-direction: column; /* ✅ fixed */
+      gap: 0.75rem;
+      max-width: 800px;
+      width: 100%;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+    }
+    .msg {
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      max-width: 70%;
+      word-wrap: break-word;
+      animation: fadeIn 0.4s ease;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .msg.user {
+      align-self: flex-end;
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+    .msg.bot {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      border-bottom-left-radius: 4px;
+    }
+    .msg.error {
+      align-self: flex-start;
+      background: var(--error-bg);
+      color: white;
+      border-bottom-left-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .msg .timestamp {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.7);
+      text-align: right;
+    }
+    .msg.bot .timestamp {
+      text-align: left;
+    }
+    .msg .avatar {
+      font-size: 0.8rem;
+      opacity: 0.8;
+      margin-bottom: 0.25rem;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+ 
+    /* Suggestion Bar */
+    .suggestions {
+      position: fixed;
+      bottom: 6rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 600px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 0.5rem;
+      z-index: 1000;
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .suggestions.hidden {
+      opacity: 0;
+      transform: translateY(-20px);
+      pointer-events: none;
+      height: 0;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    .suggestions button {
+      font-size: 0.9rem;
+      color: var(--text);
+      padding: 0.5rem;
+      cursor: pointer;
+      text-align: center;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      background: rgba(255, 255, 255, 0.05);
+      border: none;
+    }
+    .suggestions button:hover, .suggestions button:focus {
+      background: var(--accent);
+      color: #000000;
+      transform: scale(1.02);
+      outline: none;
+    }
+ 
+    /* Input Bar */
+    .input-container {
+      position: fixed;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 600px;
+      display: flex;
+      align-items: center;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 50px;
+      padding: 0.5rem;
+    }
+    #message {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      padding: 0.8rem 1rem;
+      color: var(--text);
+      font-size: 1rem;
+    }
+    #message::placeholder {
+      color: var(--text);
+      opacity: 0.5;
+    }
+    button.send-btn {
+      background: var(--accent);
+      border: none;
+      border-radius: 50px;
+      padding: 0.8rem 1.5rem;
+      color: #000000;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    button.send-btn:hover, button.send-btn:focus {
+      transform: scale(1.05);
+      outline: none;
+    }
+    button.send-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    button.send-btn.loading::after {
+      content: '';
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #000000;
+      border-top: 2px solid transparent;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-left: 0.5rem;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+ 
     /* Action Buttons */
     .action-buttons {
       display: flex;
@@ -163,474 +349,35 @@
       transform: translateY(-2px);
       outline: none;
     }
-
-    /* Suggestion Bar */
-    .suggestion-bar {
-      position: fixed;
-      bottom: 6rem;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 90%;
-      max-width: 600px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.5rem;
-      background: var(--card-bg);
-      backdrop-filter: blur(12px);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 0.5rem;
-      z-index: 1000;
-    }
-    .suggestion-bar span {
-      font-size: 0.9rem;
-      color: var(--text);
-      padding: 0.5rem;
-      cursor: pointer;
-      text-align: center;
-      border-radius: 8px;
-      transition: all 0.2s ease;
-      background: rgba(255, 255, 255, 0.05);
-    }
-    .suggestion-bar span:hover, .suggestion-bar span:focus {
-      background: var(--accent);
-      color: #000000;
-      transform: scale(1.02);
-      outline: none;
-    }
-
-    /* Input Bar */
-    .input-bar {
-      position: fixed;
-      bottom: 1rem;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 90%;
-      max-width: 600px;
-      display: flex;
-      align-items: center;
-      background: var(--card-bg);
-      backdrop-filter: blur(12px);
-      border: 1px solid var(--card-border);
-      border-radius: 50px;
-      padding: 0.5rem;
-    }
-    .input-bar input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      outline: none;
-      padding: 0.8rem 1rem;
-      color: var(--text);
-      font-size: 1rem;
-    }
-    .input-bar input::placeholder {
-      color: var(--text);
-      opacity: 0.5;
-    }
-    .input-bar button {
-      background: var(--accent);
-      border: none;
-      border-radius: 50px;
-      padding: 0.8rem 1.5rem;
-      color: #000000;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .input-bar button:hover, .input-bar button:focus {
-      transform: scale(1.05);
-      outline: none;
-    }
-    .input-bar button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
-
+ 
     /* Responsive */
     @media (max-width: 768px) {
       .sidebar { width: 240px; }
-      .content-card { padding: 1.5rem; }
-      .suggestion-bar, .input-bar { width: 95%; }
-      .suggestion-bar { grid-template-columns: 1fr; }
+      .welcome-box, #chat { padding: 1.5rem; }
+      .suggestions, .input-container { width: 95%; }
+      .suggestions { grid-template-columns: 1fr; }
       .action-buttons { flex-direction: column; right: 0.5rem; }
     }
     @media (max-width: 480px) {
-      .content-card h1 { font-size: 1.8rem; }
+      .welcome-box h1 { font-size: 1.8rem; }
       .action-buttons button { padding: 0.4rem 1rem; font-size: 0.9rem; }
-      .suggestion-bar, .input-bar { padding: 0.4rem; }
-      .suggestion-bar span, .input-bar input { font-size: 0.9rem; }
-      .input-bar button { padding: 0.6rem 1rem; }
-    }
-
-    /* Modal Styles - Updated for left positioning */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.7);
-      justify-content: center;
-      align-items: center;
-    }
-
-    .modal-content {
-      background-color: var(--bg);
-      width: 80%;
-      height: 80%;
-      border-radius: 12px;
-      padding: 0;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      border: 1px solid var(--card-border);
-      box-shadow: 0 6px 40px var(--shadow);
-    }
-
-    .close {
-      position: absolute;
-      top: 10px;
-      right: 20px;
-      font-size: 24px;
-      cursor: pointer;
-      color: var(--accent);
-      z-index: 1001;
-      transition: color 0.2s ease;
-    }
-
-    .close:hover {
-      color: var(--text);
-    }
-
-    /* History-specific Styles - Updated colors */
-    .history-header {
-      background-color: var(--card-bg);
-      height: 40px;
-      display: flex;
-      align-items: center;
-      padding: 0 15px;
-      border-bottom: 1px solid var(--card-border);
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      z-index: 1000;
-      box-shadow: 0 2px 10px var(--shadow);
-      backdrop-filter: blur(12px);
-    }
-
-    .history-sidebar {
-      width: 250px;
-      background-color: var(--card-bg);
-      padding: 60px 15px 15px 15px;
-      border-right: 1px solid var(--card-border);
-      overflow-y: auto;
-      height: 100%;
-      transition: width 0.3s ease;
-      scrollbar-width: thin;
-      scrollbar-color: var(--card-border) transparent;
-      backdrop-filter: blur(12px);
-    }
-
-    .history-sidebar h3 {
-      margin-top: 0;
-      font-size: 1.2em;
-      color: var(--accent);
-      border-bottom: 1px solid var(--card-border);
-      padding-bottom: 8px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .history-sidebar ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    .history-sidebar ul li {
-      padding: 12px;
-      cursor: pointer;
-      border-bottom: 1px solid var(--card-border);
-      transition: all 0.3s ease;
-      position: relative;
-      display: flex;
-      align-items: center;
-      color: var(--text);
-    }
-
-    .history-sidebar ul li:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-      color: var(--accent);
-    }
-
-    .history-sidebar ul li.active {
-      background-color: var(--accent);
-      color: #000000;
-      font-weight: 600;
-    }
-
-    .history-sidebar ul li.active::after {
-      content: '';
-      position: absolute;
-      right: 0;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 4px;
-      height: 20px;
-      background-color: #00aaff;
-    }
-
-    .history-main-content {
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      align-items: center;
-      background-color: var(--bg);
-      padding: 25px;
-      height: 100%;
-      overflow-y: auto;
-      transition: padding 0.3s ease;
-      scrollbar-width: thin;
-      scrollbar-color: var(--card-border) transparent;
-      padding-top: 65px;
-      padding-bottom: 25px;
-    }
-
-    .history-main-content h2 {
-      color: var(--accent);
-      font-size: 1.5em;
-      margin-bottom: 20px;
-      text-align: center;
-    }
-
-    .history-item {
-      width: 80%;
-      padding: 15px;
-      background-color: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 8px;
-      margin-bottom: 15px;
-      transition: all 0.3s ease;
-      backdrop-filter: blur(12px);
-    }
-
-    .history-item:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-      border-color: var(--accent);
-    }
-
-    .history-item p {
-      color: var(--text);
-      font-size: 1.1em;
-      margin: 5px 0;
-    }
-
-    .history-item .date {
-      color: rgba(255, 255, 255, 0.7);
-      font-size: 0.9em;
-    }
-
-    .search-bar {
-      width: 80%;
-      padding: 14px;
-      margin-bottom: 25px;
-      border: 1px solid var(--card-border);
-      border-radius: 8px;
-      font-size: 1em;
-      outline: none;
-      background-color: var(--card-bg);
-      color: var(--text);
-      transition: all 0.3s ease;
-      box-shadow: 0 2px 6px var(--shadow);
-      backdrop-filter: blur(12px);
-    }
-
-    .search-bar:focus {
-      border-color: #00aaff;
-      box-shadow: 0 0 8px rgba(0, 170, 255, 0.4);
-    }
-
-    .search-bar::placeholder {
-      color: rgba(255, 255, 255, 0.5);
-    }
-
-    /* Custom scrollbar */
-    *::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    *::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    *::-webkit-scrollbar-thumb {
-      background-color: var(--card-border);
-      border-radius: 4px;
-      border: 2px solid var(--bg);
-    }
-
-    *::-webkit-scrollbar-thumb:hover {
-      background-color: var(--accent);
-    }
-
-    @media (max-width: 768px) {
-      .modal {
-        padding: 0.5rem;
-        align-items: stretch;
-      }
-
-      .modal-content {
-        width: calc(100% - 1rem);
-        height: calc(100vh - 1rem);
-        flex-direction: column;
-      }
-
-      .history-sidebar {
-        width: 100%;
-        height: 150px;
-        padding: 50px 10px 10px 10px;
-        border-right: none;
-        border-bottom: 1px solid var(--card-border);
-        overflow-x: auto;
-      }
-
-      .history-sidebar h3 {
-        font-size: 1rem;
-        margin-bottom: 0.5rem;
-      }
-
-      .history-sidebar ul {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-      }
-
-      .history-sidebar ul li {
-        padding: 8px 12px;
-        white-space: nowrap;
-        border: 1px solid var(--card-border);
-        border-radius: 6px;
-        margin-bottom: 0;
-      }
-
-      .history-main-content {
-        padding: 15px;
-        padding-top: 20px;
-        height: calc(100% - 150px);
-      }
-
-      .search-bar, .history-item {
-        width: 95%;
-      }
-
-      .history-main-content h2 {
-        font-size: 1.2em;
-        margin-bottom: 15px;
-      }
-
-      .history-item {
-        padding: 12px;
-        margin-bottom: 10px;
-      }
-
-      .history-item p {
-        font-size: 0.95em;
-        line-height: 1.4;
-      }
-
-      .history-item .date {
-        font-size: 0.85em;
-      }
-
-      .close {
-        font-size: 28px;
-        top: 8px;
-        right: 15px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .modal {
-        padding: 0.25rem;
-      }
-
-      .modal-content {
-        width: calc(100% - 0.5rem);
-        height: calc(100vh - 0.5rem);
-        border-radius: 8px;
-      }
-
-      .history-sidebar {
-        height: 120px;
-        padding: 45px 8px 8px 8px;
-      }
-
-      .history-sidebar h3 {
-        font-size: 0.9rem;
-        margin-bottom: 0.3rem;
-      }
-
-      .history-sidebar ul li {
-        padding: 6px 10px;
-        font-size: 0.85em;
-      }
-
-      .history-main-content {
-        padding: 10px;
-        padding-top: 15px;
-        height: calc(100% - 120px);
-      }
-
-      .search-bar {
-        width: 98%;
-        padding: 10px;
-        font-size: 0.9em;
-        margin-bottom: 15px;
-      }
-
-      .history-item {
-        width: 98%;
-        padding: 10px;
-        margin-bottom: 8px;
-      }
-
-      .history-main-content h2 {
-        font-size: 1.1em;
-        margin-bottom: 10px;
-      }
-
-      .history-item p {
-        font-size: 0.9em;
-      }
-
-      .history-item .date {
-        font-size: 0.8em;
-      }
-
-      .close {
-        font-size: 24px;
-        top: 5px;
-        right: 10px;
-      }
-    }
+      .suggestions, .input-container { padding: 0.4rem; }
+      .suggestions button, #message { font-size: 0.9rem; }
+      button.send-btn { padding: 0.6rem 1rem; }
+       }
+   
   </style>
 </head>
-
 <body>
   <!-- Toggle Button -->
   <button id="toggleBtn" aria-label="Toggle navigation menu">☰</button>
-
+ 
   <!-- Action Buttons -->
   <div class="action-buttons">
     <button id="loginBtn" aria-label="Log in">Login</button>
     <button id="signupBtn" aria-label="Sign up">Signup</button>
   </div>
-
+ 
   <!-- Sidebar -->
   <nav class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
     <h2>Synapse</h2>
@@ -639,72 +386,35 @@
       <li><a href="#" tabindex="0" aria-label="Voice section">Voice</a></li>
       <li><a href="#" tabindex="0" aria-label="File section">File</a></li>
       <li><a href="#" tabindex="0" aria-label="Tasks section">Tasks</a></li>
-      <li><a href="#" id="history-menu" tabindex="0" aria-label="History section">History</a></li>
+      <li><a href="#" tabindex="0" aria-label="History section">History</a></li>
     </ul>
   </nav>
-
+ 
   <!-- Main Content -->
-  <main class="main-content" role="main">
-    <section class="content-card" aria-labelledby="welcome-title">
+  <div class="main-container" role="main">
+    <div id="welcome" class="welcome-box">
       <h1 id="welcome-title">Welcome to Synapse</h1>
       <p>Connect, explore, and interact with the world in a new way. Ask anything or dive into the menu to get started!</p>
-    </section>
-  </main>
-
-  <!-- Suggestion Bar -->
-  <div class="suggestion-bar" role="region" aria-label="Suggested questions">
-    <span tabindex="0" data-query="What's the weather like today?">“What are some restaurants near me?”</span>
-    <span tabindex="0" data-query="Tell me a fun fact!">“Where’s the closest cafe with free Wi-Fi?”</span>
-    <span tabindex="0" data-query="How do I learn coding?">“Can you find a library with internet access nearby?”</span>
-  </div>
-
-  <!-- Input Bar -->
-  <div class="input-bar" role="search">
-    <input type="text" placeholder="Ask Anything..." aria-label="Enter your question" id="queryInput" />
-    <button id="sendBtn" aria-label="Submit question">Send</button>
-  </div>
-
-  <!-- History Modal -->
-  <div id="history-modal" class="modal">
-    <div class="modal-content">
-      <span class="close" id="close-modal">&times;</span>
-      <div class="history-header"></div>
-      <div class="history-sidebar">
-        <h3>Filters</h3>
-        <ul>
-          <li class="active">All Time</li>
-          <li>Last 7 Days</li>
-          <li>Last 30 Days</li>
-        </ul>
-        <h3>Categories</h3>
-        <ul>
-          <li>Technology</li>
-          <li>Finance</li>
-          <li>General</li>
-        </ul>
-      </div>
-      <div class="history-main-content">
-        <input type="text" class="search-bar" placeholder="Search History...">
-        <h2>Conversation History</h2>
-        <div class="history-item">
-          <p>Discussion on AI Innovations - 03:00 PM IST, Aug 25, 2025</p>
-          <p class="date">Duration: 15 minutes</p>
-        </div>
-        <div class="history-item">
-          <p>Stock Market Trends Analysis - 02:30 PM IST, Aug 25, 2025</p>
-          <p class="date">Duration: 20 minutes</p>
-        </div>
-        <div class="history-item">
-          <p>Tech News Roundup - 01:45 PM IST, Aug 25, 2025</p>
-          <p class="date">Duration: 10 minutes</p>
-        </div>
-      </div>
+    </div>
+ 
+    <div id="chat" role="log" aria-live="polite"></div>
+ 
+    <!-- Suggestion Bar -->
+    <div id="suggestions" class="suggestions" role="region" aria-label="Suggested questions">
+      <button tabindex="0" onclick="quickAsk('What\'s the weather like today?')" data-query="What's the weather like today?">What's the weather like today?</button>
+      <button tabindex="0" onclick="quickAsk('Tell me a fun fact!')" data-query="Tell me a fun fact!">Tell me a fun fact!</button>
+      <button tabindex="0" onclick="quickAsk('How do I learn coding?')" data-query="How do I learn coding?">How do I learn coding?</button>
+    </div>
+ 
+    <!-- Input Bar -->
+    <div class="input-container" role="search">
+      <input type="text" id="message" placeholder="Ask Anything..." aria-label="Enter your question" maxlength="500" />
+      <button class="send-btn" onclick="sendMessage()" aria-label="Submit question">Send</button>
     </div>
   </div>
-
-  <!-- JS -->
+ 
   <script>
-    
+    // Utility function for debouncing
     const debounce = (func, wait) => {
       let timeout;
       return (...args) => {
@@ -712,109 +422,149 @@
         timeout = setTimeout(() => func.apply(this, args), wait);
       };
     };
-
+ 
     // DOM Elements
     const toggleBtn = document.getElementById("toggleBtn");
     const sidebar = document.getElementById("sidebar");
-    const queryInput = document.getElementById("queryInput");
-    const sendBtn = document.getElementById("sendBtn");
-    const suggestionBar = document.querySelector(".suggestion-bar");
-
+    const messageInput = document.getElementById("message");
+    const sendBtn = document.querySelector(".send-btn");
+    const suggestions = document.getElementById("suggestions");
+    const chat = document.getElementById("chat");
+    const API_KEY = ""; // Replace with your actual OpenAI API key
+ 
+    let conversation = [
+      { role: "system", content: "You are a helpful AI assistant." }
+    ];
+ 
+    // Scroll to bottom of chat (new messages go last)
+    const scrollToBottom = () => {
+      chat.scrollTop = chat.scrollHeight;
+    };
+ 
+    // Format timestamp
+    const getTimestamp = () => {
+      const now = new Date();
+      return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    };
+ 
     // Toggle sidebar
     const toggleSidebar = () => {
       const isActive = sidebar.classList.toggle("active");
       toggleBtn.textContent = isActive ? "✖" : "☰";
       toggleBtn.setAttribute("aria-expanded", isActive);
-      if (isActive) queryInput.focus();
+      if (isActive) {
+        sidebar.querySelector("a").focus();
+      } else {
+        messageInput.focus();
+      }
     };
-
+ 
     toggleBtn.addEventListener("click", toggleSidebar);
-
-    // Handle input submission with loading state
-    const handleQuery = async () => {
-      const query = queryInput.value.trim();
-      if (!query) return;
-
+ 
+    // Hide welcome and suggestions
+    function hideWelcome() {
+      document.getElementById("welcome").classList.add("hidden");
+      document.getElementById("suggestions").classList.add("hidden");
+    }
+ 
+    // Handle quick ask from suggestions
+    function quickAsk(text) {
+      messageInput.value = text;
+      sendMessage();
+    }
+ 
+    // Handle message submission
+    const handleMessage = async () => {
+      const text = messageInput.value.trim();
+      if (!text) {
+        messageInput.focus();
+        return;
+      }
+      if (text.length > 500) {
+        const errorMsg = document.createElement("div");
+        errorMsg.className = "msg error";
+        errorMsg.innerHTML = "⚠️ Message too long (max 500 characters).";
+        chat.appendChild(errorMsg);
+        scrollToBottom();
+        messageInput.focus();
+        return;
+      }
+ 
+      hideWelcome();
+ 
+      // User message
+      const userMsg = document.createElement("div");
+      userMsg.className = "msg user";
+      userMsg.innerHTML = `<span class="avatar">You</span>${text}<span class="timestamp">${getTimestamp()}</span>`;
+      chat.appendChild(userMsg);
+      scrollToBottom();
+      messageInput.value = "";
+ 
+      conversation.push({ role: "user", content: text });
+ 
+      // Loading message
+      const botMsg = document.createElement("div");
+      botMsg.className = "msg bot";
+      botMsg.innerHTML = `<span class="avatar">Synapse</span>⏳ Thinking...<span class="timestamp">${getTimestamp()}</span>`;
+      chat.appendChild(botMsg);
+      scrollToBottom();
+ 
       sendBtn.disabled = true;
-      sendBtn.textContent = "Sending...";
+      sendBtn.classList.add("loading");
+ 
       try {
-        // Simulate async operation (e.g., API call)
-        await new Promise(resolve => setTimeout(resolve, 500));
-        console.log("Query:", query);
-        queryInput.value = "";
-        queryInput.focus();
+        const response = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${API_KEY}`
+          },
+          body: JSON.stringify({
+            model: "gpt-4o-mini",
+            messages: conversation
+          })
+        });
+ 
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+ 
+        const data = await response.json();
+        const botText = data.choices?.[0]?.message?.content?.trim() || "⚠️ No response received.";
+ 
+        botMsg.innerHTML = `<span class="avatar">Synapse</span>${botText}<span class="timestamp">${getTimestamp()}</span>`;
+        conversation.push({ role: "assistant", content: botText });
+        scrollToBottom();
+ 
+      } catch (error) {
+        botMsg.className = "msg error";
+        botMsg.innerHTML = "❌ Error: Could not connect to the server.";
+        scrollToBottom();
       } finally {
         sendBtn.disabled = false;
-        sendBtn.textContent = "Send";
+        sendBtn.classList.remove("loading");
+        messageInput.focus();
       }
     };
-
-    // Debounced input handler
-    const debouncedHandleQuery = debounce(handleQuery, 300);
-
-    sendBtn.addEventListener("click", handleQuery);
-    queryInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") debouncedHandleQuery();
-    });
-
-    // Handle suggestion clicks
-    suggestionBar.querySelectorAll("span").forEach(suggestion => {
-      suggestion.addEventListener("click", () => {
-        queryInput.value = suggestion.dataset.query;
-        queryInput.focus();
-        debouncedHandleQuery();
-      });
-      suggestion.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          queryInput.value = suggestion.dataset.query;
-          queryInput.focus();
-          debouncedHandleQuery();
-        }
-      });
-    });
-
-    // Close sidebar with Escape key
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && sidebar.classList.contains("active")) {
-        toggleSidebar();
+ 
+    const sendMessage = debounce(handleMessage, 300);
+ 
+    messageInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
       }
     });
-
-    // Focus management for accessibility
-    sidebar.querySelectorAll("a").forEach(link => {
-      link.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          link.click();
-        }
-      });
+ 
+    document.getElementById("loginBtn").addEventListener("click", () => {
+      alert("Login functionality coming soon!");
     });
-
-    // Prevent double-tap zoom on mobile
-    document.addEventListener("touchstart", (e) => {
-      if (e.touches.length > 1) e.preventDefault();
-    }, { passive: false });
-
-    // History Modal Functionality
-    const historyMenu = document.getElementById('history-menu');
-    const modal = document.getElementById('history-modal');
-    const closeModal = document.getElementById('close-modal');
-
-    historyMenu.addEventListener('click', function(e) {
-      e.preventDefault();
-      modal.style.display = 'flex';
-    });
-
-    closeModal.addEventListener('click', function() {
-      modal.style.display = 'none';
-    });
-
-    window.addEventListener('click', function(event) {
-      if (event.target === modal) {
-        modal.style.display = 'none';
-      }
+ 
+    document.getElementById("signupBtn").addEventListener("click", () => {
+      alert("Signup functionality coming soon!");
     });
   </script>
 </body>
 </html>
+ 
+ 
